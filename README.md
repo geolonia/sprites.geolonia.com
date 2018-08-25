@@ -2,10 +2,6 @@
 
 このサーバーは、Mapbox GL JS 用のアイコン用サーバーです。
 
-```
-https://sprites.tilecloud.io/
-```
-
 ドキュメント: [https://www.mapbox.com/mapbox-gl-js/style-spec/#root-sprite](https://www.mapbox.com/mapbox-gl-js/style-spec/#root-sprite)
 
 ## アイコンについて
@@ -26,7 +22,7 @@ https://sprites.tilecloud.io/
 
 ```
 $ npm install
-$ npm run build-font # フォントをビルド
+$ npm run build-icon # アイコンをビルド
 $ npm run build-html # HTML ページをビルド
 ```
 
