@@ -15,7 +15,7 @@ Mapbox 社がオープンソースで公開している地図用のアイコン�
 https://github.com/mapbox/maki
 
 ```
-https://sprites.tilecloud.io/
+https://sprites.tilecloud.io/maki
 ```
 
 ## ビルド
