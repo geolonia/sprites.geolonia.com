@@ -12,7 +12,7 @@
 
 Mapbox 社がオープンソースで公開している地図用のアイコンセットです。
 
-https://github.com/mapbox/maki
+[https://github.com/mapbox/maki](https://github.com/mapbox/maki)
 
 ```
 https://sprites.tilecloud.io/maki
@@ -38,6 +38,6 @@ $ npm run build-html # HTML ページをビルド
 
 このプロジェクトで同梱している各アイコンのライセンスはそれぞれの配布元で確認してください。
 
-* Maki - https://github.com/mapbox/maki
+* Maki - [https://github.com/mapbox/maki](https://github.com/mapbox/maki)
 
 それ以外のソースコードはMITライセンスとします。
