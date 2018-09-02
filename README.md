@@ -18,6 +18,14 @@ Mapbox 社がオープンソースで公開している地図用のアイコン�
 https://sprites.tilecloud.io/maki
 ```
 
+### Basic
+
+このアイコンは、[osm-bright-gl-style](https://github.com/openmaptiles/osm-bright-gl-style) のフォークです。
+
+```
+https://sprites.tilecloud.io/basic
+```
+
 ## ビルド
 
 ```
