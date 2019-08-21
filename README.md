@@ -1,4 +1,4 @@
-# sprites.tilecloud.io
+# sprites.geolonia.com
 
 このサーバーは、Mapbox GL JS 用のアイコン用サーバーです。
 
@@ -15,7 +15,7 @@ Mapbox 社がオープンソースで公開している地図用のアイコン�
 [https://github.com/mapbox/maki](https://github.com/mapbox/maki)
 
 ```
-https://sprites.tilecloud.io/maki
+https://sprites.geolonia.com/maki
 ```
 
 ### Basic
@@ -23,7 +23,7 @@ https://sprites.tilecloud.io/maki
 このアイコンは、[osm-bright-gl-style](https://github.com/openmaptiles/osm-bright-gl-style) のフォークです。
 
 ```
-https://sprites.tilecloud.io/basic
+https://sprites.geolonia.com/basic
 ```
 
 ## ビルド
@@ -36,7 +36,7 @@ $ npm run build-html # HTML ページをビルド
 
 プルリクエストや Issue はいつでも歓迎します。
 
-[https://github.com/tilecloud/sprites.tilecloud.io](https://github.com/tilecloud/sprites.tilecloud.io)
+[https://github.com/geolonia/sprites.geolonia.com](https://github.com/geolonia/sprites.geolonia.com)
 
 ## 免責事項
 
