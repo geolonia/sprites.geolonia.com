@@ -4,7 +4,7 @@ var glob = require('glob');
 var path = require('path');
 
 [1, 2].forEach(function(pxRatio) {
-    var svgs = glob.sync(path.resolve('./node_modules/@mapbox/maki/icons/*.svg'))
+    var svgs = glob.sync(path.resolve('./src/*.svg'))
         .map(function(f) {
             return {
                 svg: fs.readFileSync(f),
