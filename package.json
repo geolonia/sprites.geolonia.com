@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build-html": "mdhtml README.md -t https://raw.githubusercontent.com/geolonia/md-template/master/template.html -o public/index.html",
-    "build-icon": "node bin/build.js",
+    "build-icon": "n use v10.22.0 bin/build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
