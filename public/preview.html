@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html, body, #map {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" data-zoom="7.5" data-lat="0" data-lng="0" data-marker="off"></div>
+    <script src="https://cdn.geolonia.com/dev/embed?geolonia-api-key=YOUR-API-KEY"></script>
+    <script>
+
+        const color = location.hash === '#white' ? 'basic-white' : 'basic'
+
+        const main = async () => {
+            const style = {
+                ...await fetch('https://cdn.geolonia.com/style/geolonia/basic/ja.json')
+                    .then(res => res.json()),
+                sprite: new URL(`../${color}`, location.href).href,
+
+            }
+            const map = new geolonia.Map({ container: '#map', style})
+            map.on('load', async () => {
+            const geojson = {
+                type: 'FeatureCollection',
+                features: await fetch(`./${color}.json`)
+                .then(res => res.json())
+                .then(sprites => {
+                    return (Object.keys(sprites).map((key, index) => {
+                        return {
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [0.1 * (Math.floor(index / 10)), 0.1 * (index % 10)],
+                            },
+                            properties: { key, ...sprites[key] }
+                        }
+                    }))
+                })
+            }
+
+            map.addSource('points', {
+                type: 'geojson',
+                data: geojson,
+            })
+            map.addLayer({
+                id: 'points',
+                type: 'symbol',
+                source: 'points',
+                layout: {
+                    'icon-image': ['get', 'key'],
+                    'icon-size': 1,
+                },
+                filter: ['all', ['==', '$type', 'Point']]
+            })
+        })
+        }
+        main()
+
+    </script>
+</body>
+</html>
