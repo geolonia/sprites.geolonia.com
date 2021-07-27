@@ -3,37 +3,44 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 
-[1, 2].forEach(function(pxRatio) {
-    var svgs = glob.sync(path.resolve('./src/*.svg'))
-        .map(function(f) {
-            return {
-                svg: fs.readFileSync(f),
-                id: path.basename(f).replace('.svg', '')
-            };
-        });
 
-    var file = ''
-    if (pxRatio > 1) {
-        file = `@${pxRatio}x`
-    }
+glob('src/*', (err, files) => {
+  files.forEach(file => {
+    const iconName = file.replace("src/", "");
 
-    var pngPath = path.resolve(path.join('./public/basic' + file + '.png'));
-    var jsonPath = path.resolve(path.join('./public/basic' + file + '.json'));
+    [1, 2].forEach(function(pxRatio) {
+        var svgs = glob.sync(path.resolve(`./src/${iconName}/*.svg`))
+            .map(function(f) {
+                return {
+                    svg: fs.readFileSync(f),
+                    id: path.basename(f).replace('.svg', '')
+                };
+            });
 
-    // Pass `true` in the layout parameter to generate a data layout
-    // suitable for exporting to a JSON sprite manifest file.
-    spritezero.generateLayout({ imgs: svgs, pixelRatio: pxRatio, format: true }, function(err, dataLayout) {
-        if (err) return;
-        fs.writeFileSync(jsonPath, JSON.stringify(dataLayout));
-    });
+        var file = ''
+        if (pxRatio > 1) {
+            file = `@${pxRatio}x`
+        }
 
-    // Pass `false` in the layout parameter to generate an image layout
-    // suitable for exporting to a PNG sprite image file.
-    spritezero.generateLayout({ imgs: svgs, pixelRatio: pxRatio, format: false }, function(err, imageLayout) {
-        spritezero.generateImage(imageLayout, function(err, image) {
+        var pngPath = path.resolve(path.join(`./public/${iconName}${file}.png`));
+        var jsonPath = path.resolve(path.join(`./public/${iconName}${file}.json`));
+
+        // Pass `true` in the layout parameter to generate a data layout
+        // suitable for exporting to a JSON sprite manifest file.
+        spritezero.generateLayout({ imgs: svgs, pixelRatio: pxRatio, format: true }, function(err, dataLayout) {
             if (err) return;
-            fs.writeFileSync(pngPath, image);
+            fs.writeFileSync(jsonPath, JSON.stringify(dataLayout));
+        });
+
+        // Pass `false` in the layout parameter to generate an image layout
+        // suitable for exporting to a PNG sprite image file.
+        spritezero.generateLayout({ imgs: svgs, pixelRatio: pxRatio, format: false }, function(err, imageLayout) {
+            spritezero.generateImage(imageLayout, function(err, image) {
+                if (err) return;
+                fs.writeFileSync(pngPath, image);
+            });
         });
     });
 
+  });
 });
