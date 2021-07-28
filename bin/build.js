@@ -4,12 +4,16 @@ var glob = require('glob');
 var path = require('path');
 
 
-glob('src/*', (err, files) => {
+const srcPath = path.resolve(__dirname, '..', 'src')
+const publicPath = path.resolve(__dirname, '..', 'public')
+
+glob(`${srcPath}/*`, (err, files) => {
   files.forEach(file => {
-    const iconName = file.replace("src/", "");
+
+    const iconName = file.replace(`${srcPath}/`, "");
 
     [1, 2].forEach(function(pxRatio) {
-        var svgs = glob.sync(path.resolve(`./src/${iconName}/*.svg`))
+        var svgs = glob.sync(path.join(srcPath, `${iconName}/*.svg`))
             .map(function(f) {
                 return {
                     svg: fs.readFileSync(f),
@@ -22,8 +26,8 @@ glob('src/*', (err, files) => {
             file = `@${pxRatio}x`
         }
 
-        var pngPath = path.resolve(path.join(`./public/${iconName}${file}.png`));
-        var jsonPath = path.resolve(path.join(`./public/${iconName}${file}.json`));
+        var pngPath = path.join(publicPath, `${iconName}${file}.png`);
+        var jsonPath = path.join(publicPath, `${iconName}${file}.json`);
 
         // Pass `true` in the layout parameter to generate a data layout
         // suitable for exporting to a JSON sprite manifest file.
