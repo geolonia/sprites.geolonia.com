@@ -2,7 +2,6 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 
-const targetDir = 'sample'; // 変換したいアイコンがあるディレクトリを指定
 const srcPath = path.resolve(__dirname, '..', 'src')
 
 glob(`${srcPath}/*`, (err, files) => {
@@ -31,11 +30,13 @@ glob(`${srcPath}/*`, (err, files) => {
       if (!matched) {
         const name = svg.name.replace('.svg', '')
 
-        fs.writeFileSync(`${iconPath}/${name}-11.svg`, svg.svg);
-        fs.writeFileSync(`${iconPath}/${name}-15.svg`, svg.svg);
+        const regex = /width="([0-9]+|[0-9]+px)" height="([0-9]+|[0-9]+px)"/g;
+        const svg11px = svg.svg.replace(regex, 'width="11" height="11"');
+        const svg15px = svg.svg.replace(regex, 'width="15" height="15"');
 
+        fs.writeFileSync(`${iconPath}/${name}-11.svg`, svg11px);
+        fs.writeFileSync(`${iconPath}/${name}-15.svg`, svg15px);
       }
-
     })
   });
 });
