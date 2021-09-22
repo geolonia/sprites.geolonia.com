@@ -34,6 +34,16 @@ $ npm run build-icon # アイコンをビルド
 $ npm run build-html # HTML ページをビルド
 ```
 
+## リサイズ
+
+`src/` 以下にディレクトリを作成しリサイズしたい svg アイコンを配置して下さい。以下のコマンドで 11px と 15px 四方のアイコンを生成します。
+
+```
+$ npm install
+$ npm run resize-icon -target=src/sample # svg アイコンをリサイズ
+$ npm run delete-icon -target=src/sample # リサイズされた svg アイコン以外を削除
+```
+
 プルリクエストや Issue はいつでも歓迎します。
 
 [https://github.com/geolonia/sprites.geolonia.com](https://github.com/geolonia/sprites.geolonia.com)
