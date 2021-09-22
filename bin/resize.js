@@ -2,7 +2,7 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 
-
+const targetDir = 'sample'; // 変換したいアイコンがあるディレクトリを指定
 const srcPath = path.resolve(__dirname, '..', 'src')
 
 glob(`${srcPath}/*`, (err, files) => {
@@ -24,12 +24,16 @@ glob(`${srcPath}/*`, (err, files) => {
 
     svgs.forEach(function(svg) {
 
-      // -数字にマッチするファイル名を取得
-      const matched = svg.name.match(/-[0-9]+\.svg$/g)
+      // ファイル名末尾が -数字 のファイルと、サイズが特殊なファイルは除外。
+      const regex = /-[0-9]+\.svg$|^oneway|^default/g;
+      const matched = svg.name.match(regex)
 
       if (!matched) {
-        fs.writeFileSync(`${iconPath}/`,req.query.text);
-        // res.send("書き込みしました");
+        const name = svg.name.replace('.svg', '')
+
+        fs.writeFileSync(`${iconPath}/${name}-11.svg`, svg.svg);
+        fs.writeFileSync(`${iconPath}/${name}-15.svg`, svg.svg);
+
       }
 
     })
