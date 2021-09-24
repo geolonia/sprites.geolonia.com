@@ -2,33 +2,39 @@ var fs = require('fs');
 var glob = require('glob');
 var path = require('path');
 
-const srcPath = path.resolve(__dirname, '..', 'src')
+function deleteOriginal(targetDir) {
 
-glob(`${srcPath}/*`, (err, files) => {
+  const targetPath = path.resolve(__dirname, '..', targetDir);
 
-  files.forEach(file => {
+  if( !fs.existsSync( targetPath ) ){
+    console.log( "Specified directory does not exist.");
+    process.exit(1);
+  };
 
-    const iconCategoryName = file.replace(`${srcPath}/`, "");
-    const iconPath = path.join(srcPath, iconCategoryName);
-
-    var svgs = glob.sync(`${iconPath}/*.svg`)
-    .map(function(f) {
-      const iconName = f.replace(`${iconPath}/`, '')
-        return {
-            name: iconName,
-            path: f
-        };
-    });
-
-    svgs.forEach(function(svg) {
-
-      // ファイル名末尾が -数字 のファイルと、サイズが特殊なファイルは除外。
-      const regex = /-[0-9]+\.svg$|^oneway|^default/g;
-      const matched = svg.name.match(regex)
-
-      if (!matched) {
-        fs.unlinkSync(svg.path)
-      }
-    })
+  var svgs = glob.sync(`${targetPath}/*.svg`)
+  .map(function(f) {
+    const iconName = f.replace(`${targetPath}/`, '')
+      return {
+          name: iconName,
+          path: f
+      };
   });
-});
+
+  svgs.forEach(function(svg) {
+
+    // ファイル名末尾が -数字 のファイルと、サイズが特殊なファイルは除外。
+    const regex = /-[0-9]+\.svg$|^oneway|^default/g;
+    const matched = svg.name.match(regex)
+
+    if (!matched) {
+      fs.unlinkSync(svg.path)
+    }
+  })
+}
+
+// CLI 実行時
+if (process.argv[2]) {
+  deleteOriginal(process.argv[2])
+}
+
+module.exports = deleteOriginal;
