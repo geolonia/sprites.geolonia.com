@@ -8,19 +8,11 @@
 
 このサーバーでは以下のアイコンセットを提供しています。それぞれの URL を `style.json` の `sprite` の値にセットしてください。
 
-### Maki
-
-Mapbox 社がオープンソースで公開している地図用のアイコンセットです。
-
-[https://github.com/mapbox/maki](https://github.com/mapbox/maki)
-
-```
-https://sprites.geolonia.com/maki
-```
-
 ### Basic
 
-このアイコンは、[osm-bright-gl-style](https://github.com/openmaptiles/osm-bright-gl-style) のフォークです。
+Mapbox 社がオープンソースで公開している地図用のアイコンセット([6.2.0](https://github.com/mapbox/maki/releases/tag/6.2.0))を使用しています。
+
+[https://github.com/mapbox/maki/releases/tag/6.2.0](https://github.com/mapbox/maki/releases/tag/6.2.0)
 
 ```
 https://sprites.geolonia.com/basic
