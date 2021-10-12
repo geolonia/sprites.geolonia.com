@@ -14,8 +14,28 @@ Mapbox 社がオープンソースで公開している地図用のアイコン�
 
 [https://github.com/mapbox/maki/releases/tag/6.2.0](https://github.com/mapbox/maki/releases/tag/6.2.0)
 
+#### Black
+
+黒いアイコンセットを配信しています。
+
 ```
 https://sprites.geolonia.com/basic
+```
+
+#### White
+
+白いアイコンセットを配信しています。
+
+```
+https://sprites.geolonia.com/basic-white
+```
+
+#### Color
+
+カラフルなアイコンセットを配信しています。
+
+```
+https://sprites.geolonia.com/basic-color
 ```
 
 ## ビルド
