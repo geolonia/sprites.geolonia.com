@@ -1,1 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 17 17" height="17" width="17"><title>square-11.svg</title><rect fill="none" x="0" y="0" width="17" height="17"></rect><rect x="1" y="1" rx="4" ry="4" width="15" height="15" stroke="#ffffff" style="stroke-linejoin:round;stroke-miterlimit:4;" fill="#ffffff" stroke-width="2"></rect><rect x="1" y="1" width="15" height="15" rx="4" ry="4" fill="#0085ff"></rect><path fill="#ffffff" transform="translate(3 3)" d="M9,10H2c-0.5523,0-1-0.4477-1-1V2c0-0.5523,0.4477-1,1-1h7c0.5523,0,1,0.4477,1,1v7C10,9.5523,9.5523,10,9,10z"></path></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.1" id="square-11" xmlns="http://www.w3.org/2000/svg" width="11px" height="11px" viewBox="0 0 11 11">
+  <path d="M9,10H2c-0.5523,0-1-0.4477-1-1V2c0-0.5523,0.4477-1,1-1h7c0.5523,0,1,0.4477,1,1v7C10,9.5523,9.5523,10,9,10z"/>
+</svg>
