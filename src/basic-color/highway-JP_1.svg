@@ -4,12 +4,10 @@
 	 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:none;}
-	.st1{fill:#00A363;stroke:#00A363;stroke-width:2;stroke-linejoin:round;}
-	.st2{fill:#00A363;stroke:#FFFFFF;stroke-linejoin:round;}
-	.st3{fill:#00B06B;}
+	.st1{fill:#00A363;stroke:#FFFFFF;stroke-width:2;stroke-linejoin:round;}
+	.st2{fill:#00B06B;}
 </style>
 <rect class="st0" width="20" height="20"/>
 <path class="st1" d="M2,2h16v16H2V2z"/>
 <path class="st2" d="M2,2h16v16H2V2z"/>
-<path class="st3" d="M2,2h16v16H2V2z"/>
 </svg>
