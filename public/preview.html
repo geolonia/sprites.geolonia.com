@@ -18,7 +18,7 @@
     <script src="https://cdn.geolonia.com/dev/embed?geolonia-api-key=YOUR-API-KEY"></script>
     <script>
 
-        const color = location.hash === '#white' ? 'basic-white' : 'basic'
+        const color = location.hash.replace('#', '') || 'basic'
 
         const main = async () => {
             const style = {
