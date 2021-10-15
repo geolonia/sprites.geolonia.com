@@ -14,24 +14,28 @@
     </style>
 </head>
 <body>
-    <div id="map" data-zoom="7.5" data-lat="0" data-lng="0" data-marker="off"></div>
+    <div id="map" data-marker="off" data-hash="on"></div>
     <script src="https://cdn.geolonia.com/dev/embed?geolonia-api-key=YOUR-API-KEY"></script>
     <script>
+        const params = new URLSearchParams(window.location.search)
+        console.log(location.search)
+        const spriteId = params.get('sprite') || 'basic'
+        const styleIdentifier = params.get('style') || 'geolonia/basic'
 
-        const color = location.hash.replace('#', '') || 'basic'
+        window.location.search = new URLSearchParams({ sprite: spriteId, style: styleIdentifier }).toString()
 
         const main = async () => {
             const style = {
-                ...await fetch('https://cdn.geolonia.com/style/geolonia/basic/ja.json')
+                ...await fetch(`https://cdn.geolonia.com/style/${styleIdentifier}/ja.json`)
                     .then(res => res.json()),
-                sprite: new URL(`../${color}`, location.href).href,
+                sprite: new URL(`../${spriteId}`, location.href).href,
 
             }
-            const map = new geolonia.Map({ container: '#map', style})
+            const map = new geolonia.Map({ container: '#map', style })
             map.on('load', async () => {
             const geojson = {
                 type: 'FeatureCollection',
-                features: await fetch(`./${color}.json`)
+                features: await fetch(`./${spriteId}.json`)
                 .then(res => res.json())
                 .then(sprites => {
                     return (Object.keys(sprites).map((key, index) => {
@@ -39,7 +43,10 @@
                             type: 'Feature',
                             geometry: {
                                 type: 'Point',
-                                coordinates: [0.1 * (Math.floor(index / 10)), 0.1 * (index % 10)],
+                                coordinates: [
+                                  141 + 0.1 * (Math.floor(index / 10)),
+                                  35 + 0.1 * (index % 10),
+                                ],
                             },
                             properties: { key, ...sprites[key] }
                         }
