@@ -54,7 +54,13 @@ const writeFile = ({ name, data }) => {
 };
 
 const main = async () => {
-  const dirnames = fs.readdirSync(path.resolve(__dirname, "..", "src"));
+  const dirnames = fs
+    .readdirSync(path.resolve(__dirname, "..", "src"), {
+      withFileTypes: true,
+    })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name);
+
   // generate x1 and x2
   const items = await Promise.all([
     ...dirnames.map((name) => generate(name, 1, "json").then(writeFile)),
