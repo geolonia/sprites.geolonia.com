@@ -3,14 +3,13 @@ const path = require("path");
 const parser = require("fast-xml-parser");
 const { j2xParser } = require("fast-xml-parser");
 const invertColor = require("invert-color");
-const { join } = require("path");
 
-const invertStyle = (styleText) => {
+const aplyRect = (styleText) => {
   const styleEntries = styleText.split(";").map((kvp) => kvp.split(":"));
   for (const styleEntry of styleEntries) {
-    const [key, value] = styleEntry;
-    if (key === "color") {
-      styleEntry[1] = invertColor(value);
+    const [key] = styleEntry;
+    if (key === "fill") {
+      styleEntry[1] = "#ffffff";
     }
   }
   return styleEntries.map((entry) => entry.join(":")).join(";");
@@ -36,10 +35,10 @@ const convert = (parent) => {
       } else if (key === "rect") {
         if (Array.isArray(parent.rect)) {
           for (const eachrect of parent.rect) {
-            eachrect["@_style"] = invertStyle(eachrect["@_style"]);
+            eachrect["@_style"] = aplyRect(eachrect["@_style"]);
           }
         } else {
-          eachrect["@_style"] = invertStyle(eachrect["@_style"]);
+          eachrect["@_style"] = aplyRect(eachrect["@_style"]);
         }
       } else {
         convert(parent[key]);
