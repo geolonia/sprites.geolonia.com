@@ -9,7 +9,7 @@ const invertStyle = (styleText) => {
   const styleEntries = styleText.split(";").map((kvp) => kvp.split(":"));
   for (const styleEntry of styleEntries) {
     const [key, value] = styleEntry;
-    if (key === "color" || key === "fill") {
+    if (key === "color") {
       styleEntry[1] = invertColor(value);
     }
   }
