@@ -1,10 +1,20 @@
 const fs = require("fs");
 const path = require("path");
 const parser = require("fast-xml-parser");
-const { j2xParser } = require("fast-xml-parser");
-const invertColor = require("invert-color");
 
-const aplyRect = (styleText) => {
+// fast-xml-parser options
+const parserOptions = {
+  attributeNamePrefix: "@_",
+  textNodeName: "#text",
+  ignoreAttributes: false,
+};
+
+/**
+ *
+ * @param {string} styleText
+ * @returns mutated style text
+ */
+const whitenRectBorder = (styleText) => {
   const styleEntries = styleText.split(";").map((kvp) => kvp.split(":"));
   for (const styleEntry of styleEntries) {
     const [key] = styleEntry;
@@ -15,33 +25,42 @@ const aplyRect = (styleText) => {
   return styleEntries.map((entry) => entry.join(":")).join(";");
 };
 
-// destructive. Append <path fill="#ffffff" />
-const convert = (parent) => {
+/**
+ * destructive recursion to append white color
+ * @param {object} parent
+ * @param {string} filename
+ */
+const convert = (parent, filename) => {
   if (Array.isArray(parent)) {
     for (const item of parent) {
-      convert(item);
+      convert(item, filename);
     }
   } else if (typeof parent === "object") {
-    const keys = Object.keys(parent).filter((key) => !key.startsWith("@_"));
+    const keys = Object.keys(parent)
+      // should filter child node, not attribute
+      .filter((key) => !key.startsWith(parserOptions.attributeNamePrefix));
+
     for (const key of keys) {
       if (key === "path") {
+        const fillKey = `${parserOptions.attributeNamePrefix}fill`;
         if (Array.isArray(parent.path)) {
           for (const eachPath of parent.path) {
-            eachPath["@_fill"] = "#ffffff";
+            eachPath[fillKey] = "#ffffff";
           }
         } else {
-          parent.path["@_fill"] = "#ffffff";
+          parent.path[fillKey] = "#ffffff";
         }
-      } else if (key === "rect") {
+      } else if (filename.match(/$default_[0-9]/) && key === "rect") {
+        const styleKey = `${parserOptions.attributeNamePrefix}style`;
         if (Array.isArray(parent.rect)) {
-          for (const eachrect of parent.rect) {
-            eachrect["@_style"] = aplyRect(eachrect["@_style"]);
+          for (const rect of parent.rect) {
+            rect[styleKey] = whitenRectBorder(rect[styleKey]);
           }
         } else {
-          eachrect["@_style"] = aplyRect(eachrect["@_style"]);
+          rect[styleKey] = whitenRectBorder(rect[styleKey]);
         }
       } else {
-        convert(parent[key]);
+        convert(parent[key], filename);
       }
     }
   }
@@ -59,28 +78,23 @@ const main = async () => {
       (dirent) => dirent.isFile() && dirent.name.toLowerCase().endsWith(".svg")
     )
     .map((dirent) => ({
+      filename: dirent.name,
       src: path.resolve(basicDir, dirent.name),
       dest: path.resolve(basicWhiteDir, dirent.name),
     }));
 
   await Promise.all(
-    svgs.map(({ src, dest }) => {
+    svgs.map(({ filename, src, dest }) => {
       const xmlData = fs.readFileSync(src).toString();
-      const xml = parser.parse(xmlData, {
-        attributeNamePrefix: "@_",
-        textNodeName: "#text",
-        ignoreAttributes: false,
-      });
+      const xml = parser.parse(xmlData, parserOptions);
 
-      convert(xml);
-
-      const whitened = new j2xParser({
-        attributeNamePrefix: "@_",
-        textNodeName: "#text",
-        ignoreAttributes: false,
+      convert(xml, filename);
+      const whitenedXML = new parser.j2xParser({
+        ...parserOptions,
+        format: true,
       }).parse(xml);
 
-      fs.writeFileSync(dest, whitened);
+      fs.writeFileSync(dest, whitenedXML);
     })
   );
 };
