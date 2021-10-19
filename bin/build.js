@@ -3,6 +3,31 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
+const allAliases = JSON.parse(
+  fs
+    .readFileSync(path.resolve(__dirname, "..", "src", "config.json"))
+    .toString()
+);
+
+const alias = (src, data) => {
+  const aliasConfig = allAliases[src] || {};
+  Object.keys(aliasConfig)
+    .filter(
+      (key) => !!aliasConfig[key] && Array.isArray(aliasConfig[key].aliases)
+    )
+    .forEach((key) => {
+      if (!data[key]) {
+        throw new Error(`${key} cannnot be found in the layout.`);
+      }
+      const { aliases } = aliasConfig[key];
+      aliases.forEach((aliasKey) => {
+        data[aliasKey] = data[key];
+      });
+    });
+
+  return data;
+};
+
 /**
  * @param {string} basename An identifier for the distributing sprites
  * @param {number} pxRatio 1x, 2x or ..
@@ -28,7 +53,7 @@ const generate = (basename, pxRatio, format) => {
         if (error) {
           reject(error);
         } else if (format === "json") {
-          const json = JSON.stringify(layout);
+          const json = JSON.stringify(alias(basename, layout));
           resolve({ name: `${basename}${postfix}.json`, data: json });
         } else {
           spritezero.generateImage(layout, (error, sprite) => {
