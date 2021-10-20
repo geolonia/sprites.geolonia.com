@@ -9,6 +9,7 @@ const allAliases = JSON.parse(
     .toString()
 );
 
+// make aliases with src/config.json
 const alias = (src, data) => {
   const aliasConfig = allAliases[src] || {};
   Object.keys(aliasConfig)
@@ -17,7 +18,7 @@ const alias = (src, data) => {
     )
     .forEach((key) => {
       if (!data[key]) {
-        throw new Error(`${key} cannnot be found in the layout.`);
+        throw new Error(`${key} cannot be found in the layout.`);
       }
       const { aliases } = aliasConfig[key];
       aliases.forEach((aliasKey) => {
@@ -31,10 +32,9 @@ const alias = (src, data) => {
 /**
  * @param {string} basename An identifier for the distributing sprites
  * @param {number} pxRatio 1x, 2x or ..
- * @param {'json' | 'png'} Output format
- * @returns { name: string, data: Buffer }[]
+ * @returns { name: string, data: Buffer }
  */
-const generate = (basename, pxRatio, format) => {
+const genLayout = (basename, pxRatio) => {
   const imgs = glob
     .sync(path.resolve(__dirname, "..", "src", basename, "*.svg"))
     .map((f) => {
@@ -48,13 +48,42 @@ const generate = (basename, pxRatio, format) => {
 
   return new Promise((resolve, reject) => {
     spritezero.generateLayout(
-      { imgs, pixelRatio: pxRatio, format: format === "json" },
+      { imgs, pixelRatio: pxRatio, format: true },
       (error, layout) => {
         if (error) {
           reject(error);
-        } else if (format === "json") {
+        } else {
           const json = JSON.stringify(alias(basename, layout));
           resolve({ name: `${basename}${postfix}.json`, data: json });
+        }
+      }
+    );
+  });
+};
+
+/**
+ * @param {string} basename An identifier for the distributing sprites
+ * @param {number} pxRatio 1x, 2x or ..
+ * @returns { name: string, data: string }
+ */
+const genSprite = (basename, pxRatio) => {
+  const imgs = glob
+    .sync(path.resolve(__dirname, "..", "src", basename, "*.svg"))
+    .map((f) => {
+      return {
+        svg: fs.readFileSync(f),
+        id: path.basename(f).replace(".svg", ""),
+      };
+    });
+
+  const postfix = pxRatio > 1 ? `@${pxRatio}x` : "";
+
+  return new Promise((resolve, reject) => {
+    spritezero.generateLayout(
+      { imgs, pixelRatio: pxRatio, format: false },
+      (error, layout) => {
+        if (error) {
+          reject(error);
         } else {
           spritezero.generateImage(layout, (error, sprite) => {
             if (error) {
@@ -71,11 +100,12 @@ const generate = (basename, pxRatio, format) => {
 
 /**
  *
- * @param { name: string, data: string | Buffer }[] files
+ * @param { name: string, data: string | Buffer } file
  */
 const writeFile = ({ name, data }) => {
   const filepath = path.resolve(__dirname, "..", "public", name);
   fs.writeFileSync(filepath, data);
+  return filepath;
 };
 
 const main = async () => {
@@ -87,11 +117,11 @@ const main = async () => {
     .map((dirent) => dirent.name);
 
   // generate x1 and x2
-  const items = await Promise.all([
-    ...dirnames.map((name) => generate(name, 1, "json").then(writeFile)),
-    ...dirnames.map((name) => generate(name, 2, "json").then(writeFile)),
-    ...dirnames.map((name) => generate(name, 1, "png").then(writeFile)),
-    ...dirnames.map((name) => generate(name, 2, "png").then(writeFile)),
+  const files = await Promise.all([
+    ...dirnames.map((name) => genLayout(name, 1).then(writeFile)),
+    ...dirnames.map((name) => genLayout(name, 2).then(writeFile)),
+    ...dirnames.map((name) => genSprite(name, 1).then(writeFile)),
+    ...dirnames.map((name) => genSprite(name, 2).then(writeFile)),
   ]);
 };
 
