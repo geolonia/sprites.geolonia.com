@@ -38,8 +38,7 @@ https://sprites.geolonia.com/basic-color
 
 ```shell
 $ npm install
-$ npm run build-icon  # アイコンをビルド
-$ npm run build-white # 白色アイコンの SVG をビルド
+$ npm run build-icon  # アイコンをビルド。src/basic-white/*.svg は 自動的に生成されます
 $ npm run build-html  # HTML ページをビルド
 ```
 
