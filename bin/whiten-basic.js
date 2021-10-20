@@ -1,6 +1,10 @@
+console.time();
 const fs = require("fs");
 const path = require("path");
 const parser = require("fast-xml-parser");
+
+const basicDir = path.resolve(__dirname, "..", "src", "basic");
+const basicWhiteDir = path.resolve(__dirname, "..", "src", "basic-white");
 
 // fast-xml-parser options
 const parserOptions = {
@@ -10,16 +14,15 @@ const parserOptions = {
 };
 
 /**
- *
+ * Special rule be applied for default_x
  * @param {string} styleText
  * @returns mutated style text
  */
-const whitenRectBorder = (styleText) => {
+const whitenDefault_x = (styleText) => {
   const styleEntries = styleText.split(";").map((kvp) => kvp.split(":"));
-  for (const styleEntry of styleEntries) {
-    const [key] = styleEntry;
-    if (key === "fill") {
-      styleEntry[1] = "#ffffff";
+  for (const entry of styleEntries) {
+    if (entry[0] === "fill") {
+      entry[1] = "#ffffff";
     }
   }
   return styleEntries.map((entry) => entry.join(":")).join(";");
@@ -31,72 +34,49 @@ const whitenRectBorder = (styleText) => {
  * @param {string} filename
  */
 const convert = (parent, filename) => {
-  if (Array.isArray(parent)) {
-    for (const item of parent) {
-      convert(item, filename);
-    }
-  } else if (typeof parent === "object") {
-    const keys = Object.keys(parent)
-      // should filter child node, not attribute
-      .filter((key) => !key.startsWith(parserOptions.attributeNamePrefix));
+  const keys = Object.keys(parent)
+    // should filter child node, not attribute
+    .filter((key) => !key.startsWith(parserOptions.attributeNamePrefix));
 
-    for (const key of keys) {
+  for (const key of keys) {
+    const children = Array.isArray(parent[key]) ? parent[key] : [parent[key]];
+    for (const child of children) {
       if (key === "path") {
-        const fillKey = `${parserOptions.attributeNamePrefix}fill`;
-        if (Array.isArray(parent.path)) {
-          for (const eachPath of parent.path) {
-            eachPath[fillKey] = "#ffffff";
-          }
-        } else {
-          parent.path[fillKey] = "#ffffff";
-        }
+        const appendingKey = `${parserOptions.attributeNamePrefix}fill`;
+        child[appendingKey] = "#ffffff";
       } else if (filename.match(/$default_[0-9]/) && key === "rect") {
-        const styleKey = `${parserOptions.attributeNamePrefix}style`;
-        if (Array.isArray(parent.rect)) {
-          for (const rect of parent.rect) {
-            rect[styleKey] = whitenRectBorder(rect[styleKey]);
-          }
-        } else {
-          rect[styleKey] = whitenRectBorder(rect[styleKey]);
-        }
+        const appendingKey = `${parserOptions.attributeNamePrefix}style`;
+        child[appendingKey] = whitenDefault_x(child[appendingKey]);
       } else {
-        convert(parent[key], filename);
+        if (typeof child === "object") {
+          convert(child, filename);
+        }
       }
     }
   }
 };
 
-const main = async () => {
-  const basicDir = path.resolve(__dirname, "..", "src", "basic");
-  const basicWhiteDir = path.resolve(__dirname, "..", "src", "basic-white");
+fs.readdirSync(basicDir, {
+  withFileTypes: true,
+})
+  .filter(
+    (dirent) => dirent.isFile() && dirent.name.toLowerCase().endsWith(".svg")
+  )
+  .forEach((dirent) => {
+    const filename = dirent.name;
+    const src = path.resolve(basicDir, dirent.name);
+    const dest = path.resolve(basicWhiteDir, dirent.name);
 
-  const svgs = fs
-    .readdirSync(basicDir, {
-      withFileTypes: true,
-    })
-    .filter(
-      (dirent) => dirent.isFile() && dirent.name.toLowerCase().endsWith(".svg")
-    )
-    .map((dirent) => ({
-      filename: dirent.name,
-      src: path.resolve(basicDir, dirent.name),
-      dest: path.resolve(basicWhiteDir, dirent.name),
-    }));
+    const xml = fs.readFileSync(src).toString();
+    const tree = parser.parse(xml, parserOptions);
 
-  await Promise.all(
-    svgs.map(({ filename, src, dest }) => {
-      const xmlData = fs.readFileSync(src).toString();
-      const xml = parser.parse(xmlData, parserOptions);
+    convert(tree, filename);
 
-      convert(xml, filename);
-      const whitenedXML = new parser.j2xParser({
-        ...parserOptions,
-        format: true,
-      }).parse(xml);
+    const whiteXml = new parser.j2xParser({
+      ...parserOptions,
+      format: true,
+    }).parse(tree);
 
-      fs.writeFileSync(dest, whitenedXML);
-    })
-  );
-};
-
-main();
+    fs.writeFileSync(dest, whiteXml);
+  });
+console.timeEnd();
