@@ -31,7 +31,9 @@ const genLayout = (basename, pxRatio) => {
   try {
     aliasMap = JSON.parse(
       fs
-        .readFileSync(path.resolve(__dirname, "..", "src", `${basename}.json`))
+        .readFileSync(
+          path.resolve(__dirname, "..", "src", `${basename}.config.json`)
+        )
         .toString()
     ).aliasMap;
   } catch {}
