@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build-html": "mdhtml README.md -t https://raw.githubusercontent.com/geolonia/md-template/master/template.html -o public/index.html",
-    "build-icon": "rimraf src/basic-white/*.svg && cp src/basic.json src/basic-white.json && node bin/whiten-basic.js && node bin/build.js",
+    "build-white": "rimraf src/basic-white/*.svg && cp src/basic.config.json src/basic-white.config.json && node bin/whiten-basic.js",
+    "build-icon": "npm run build-white && node bin/build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
