@@ -1,50 +1,134 @@
-var spritezero = require('@mapbox/spritezero');
-var fs = require('fs');
-var glob = require('glob');
-var path = require('path');
+const spritezero = require("@mapbox/spritezero");
+const fs = require("fs");
+const glob = require("glob");
+const path = require("path");
 
+// make aliases with src/${sprite-name}.json
+const alias = (aliasMap, data) => {
+  const keys = Object.keys(aliasMap || {}).filter((key) =>
+    Array.isArray(aliasMap[key])
+  );
+  for (const key of keys) {
+    if (!data[key]) {
+      throw new Error(`${key} cannot be found in the layout.`);
+    } else {
+      aliasMap[key].forEach((aliasKey) => {
+        data[aliasKey] = data[key];
+      });
+    }
+  }
 
-const srcPath = path.resolve(__dirname, '..', 'src')
-const publicPath = path.resolve(__dirname, '..', 'public')
+  return data;
+};
 
-glob(`${srcPath}/*`, (err, files) => {
-  files.forEach(file => {
+/**
+ * @param {string} basename An identifier for the distributing sprites
+ * @param {number} pxRatio 1x, 2x or ..
+ * @returns { name: string, data: Buffer }
+ */
+const genLayout = (basename, pxRatio) => {
+  let aliasMap = {};
+  try {
+    aliasMap = JSON.parse(
+      fs
+        .readFileSync(
+          path.resolve(__dirname, "..", "src", `${basename}.config.json`)
+        )
+        .toString()
+    ).aliasMap;
+  } catch {}
 
-    const iconName = file.replace(`${srcPath}/`, "");
-
-    [1, 2].forEach(function(pxRatio) {
-        var svgs = glob.sync(path.join(srcPath, `${iconName}/*.svg`))
-            .map(function(f) {
-                return {
-                    svg: fs.readFileSync(f),
-                    id: path.basename(f).replace('.svg', '')
-                };
-            });
-
-        var file = ''
-        if (pxRatio > 1) {
-            file = `@${pxRatio}x`
-        }
-
-        var pngPath = path.join(publicPath, `${iconName}${file}.png`);
-        var jsonPath = path.join(publicPath, `${iconName}${file}.json`);
-
-        // Pass `true` in the layout parameter to generate a data layout
-        // suitable for exporting to a JSON sprite manifest file.
-        spritezero.generateLayout({ imgs: svgs, pixelRatio: pxRatio, format: true }, function(err, dataLayout) {
-            if (err) return;
-            fs.writeFileSync(jsonPath, JSON.stringify(dataLayout));
-        });
-
-        // Pass `false` in the layout parameter to generate an image layout
-        // suitable for exporting to a PNG sprite image file.
-        spritezero.generateLayout({ imgs: svgs, pixelRatio: pxRatio, format: false }, function(err, imageLayout) {
-            spritezero.generateImage(imageLayout, function(err, image) {
-                if (err) return;
-                fs.writeFileSync(pngPath, image);
-            });
-        });
+  const imgs = glob
+    .sync(path.resolve(__dirname, "..", "src", basename, "*.svg"))
+    .map((f) => {
+      return {
+        svg: fs.readFileSync(f),
+        id: path.basename(f).replace(".svg", ""),
+      };
     });
 
+  const postfix = pxRatio > 1 ? `@${pxRatio}x` : "";
+
+  return new Promise((resolve, reject) => {
+    spritezero.generateLayout(
+      { imgs, pixelRatio: pxRatio, format: true },
+      (error, layout) => {
+        if (error) {
+          reject(error);
+        } else {
+          const layoutWithAliases = alias(aliasMap, layout);
+          resolve({
+            name: `${basename}${postfix}.json`,
+            data: JSON.stringify(layoutWithAliases),
+          });
+        }
+      }
+    );
   });
-});
+};
+
+/**
+ * @param {string} basename An identifier for the distributing sprites
+ * @param {number} pxRatio 1x, 2x or ..
+ * @returns { name: string, data: string }
+ */
+const genSprite = (basename, pxRatio) => {
+  const imgs = glob
+    .sync(path.resolve(__dirname, "..", "src", basename, "*.svg"))
+    .map((f) => {
+      return {
+        svg: fs.readFileSync(f),
+        id: path.basename(f).replace(".svg", ""),
+      };
+    });
+
+  const postfix = pxRatio > 1 ? `@${pxRatio}x` : "";
+
+  return new Promise((resolve, reject) => {
+    spritezero.generateLayout(
+      { imgs, pixelRatio: pxRatio, format: false },
+      (error, layout) => {
+        if (error) {
+          reject(error);
+        } else {
+          spritezero.generateImage(layout, (error, sprite) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve({ name: `${basename}${postfix}.png`, data: sprite });
+            }
+          });
+        }
+      }
+    );
+  });
+};
+
+/**
+ *
+ * @param { name: string, data: string | Buffer } file
+ */
+const writeFile = ({ name, data }) => {
+  const filepath = path.resolve(__dirname, "..", "public", name);
+  fs.writeFileSync(filepath, data);
+  return filepath;
+};
+
+const main = async () => {
+  const dirnames = fs
+    .readdirSync(path.resolve(__dirname, "..", "src"), {
+      withFileTypes: true,
+    })
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name);
+
+  // generate x1 and x2
+  const files = await Promise.all([
+    ...dirnames.map((name) => genLayout(name, 1).then(writeFile)),
+    ...dirnames.map((name) => genLayout(name, 2).then(writeFile)),
+    ...dirnames.map((name) => genSprite(name, 1).then(writeFile)),
+    ...dirnames.map((name) => genSprite(name, 2).then(writeFile)),
+  ]);
+};
+
+main();
