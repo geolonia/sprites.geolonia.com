@@ -54,10 +54,10 @@ const genLayout = (basename, pxRatio) => {
         if (error) {
           reject(error);
         } else {
-          const layout = alias(aliasMap, layout);
+          const layoutWithAliases = alias(aliasMap, layout);
           resolve({
             name: `${basename}${postfix}.json`,
-            data: JSON.stringify(layout),
+            data: JSON.stringify(layoutWithAliases),
           });
         }
       }
