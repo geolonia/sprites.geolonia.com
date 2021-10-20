@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build-html": "mdhtml README.md -t https://raw.githubusercontent.com/geolonia/md-template/master/template.html -o public/index.html",
+    "build-white": "node bin/whiten-basic.js",
     "build-icon": "node bin/build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +16,7 @@
   },
   "devDependencies": {
     "@mapbox/spritezero": "^7.0.1",
-    "@tilecloud/mdhtml": "^0.2.0"
+    "@tilecloud/mdhtml": "^0.2.0",
+    "fast-xml-parser": "^3.20.3"
   }
 }

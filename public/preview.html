@@ -14,54 +14,80 @@
     </style>
 </head>
 <body>
-    <div id="map" data-zoom="7.5" data-lat="0" data-lng="0" data-marker="off"></div>
+    <div
+      id="map"
+      data-marker="off"
+      data-hash="on"
+      data-zoom="12.45"
+      data-lat="34.977"
+      data-lng="140.04806"
+    ></div>
     <script src="https://cdn.geolonia.com/dev/embed?geolonia-api-key=YOUR-API-KEY"></script>
     <script>
-
-        const color = location.hash.replace('#', '') || 'basic'
+        const params = new URLSearchParams(window.location.search)
+        const spriteId = params.get('sprite') || 'basic'
+        const styleIdentifier = params.get('style') || 'geolonia/basic'
 
         const main = async () => {
             const style = {
-                ...await fetch('https://cdn.geolonia.com/style/geolonia/basic/ja.json')
+                ...await fetch(`https://cdn.geolonia.com/style/${styleIdentifier}/ja.json`)
                     .then(res => res.json()),
-                sprite: new URL(`../${color}`, location.href).href,
+                sprite: new URL(`../${spriteId}`, location.href).href,
 
             }
-            const map = new geolonia.Map({ container: '#map', style})
+            const map = new geolonia.Map({ container: '#map', style })
             map.on('load', async () => {
-            const geojson = {
-                type: 'FeatureCollection',
-                features: await fetch(`./${color}.json`)
-                .then(res => res.json())
-                .then(sprites => {
-                    return (Object.keys(sprites).map((key, index) => {
-                        return {
-                            type: 'Feature',
-                            geometry: {
-                                type: 'Point',
-                                coordinates: [0.1 * (Math.floor(index / 10)), 0.1 * (index % 10)],
-                            },
-                            properties: { key, ...sprites[key] }
-                        }
-                    }))
-                })
-            }
+              const nextSearch = new URLSearchParams({ sprite: spriteId, style: styleIdentifier }).toString()
+              const normalizedURL = `${window.location.origin}${window.location.pathname}?${nextSearch}${window.location.hash}`
+              window.history.replaceState({}, '', normalizedURL)
 
-            map.addSource('points', {
-                type: 'geojson',
-                data: geojson,
-            })
-            map.addLayer({
-                id: 'points',
-                type: 'symbol',
-                source: 'points',
-                layout: {
-                    'icon-image': ['get', 'key'],
-                    'icon-size': 1,
-                },
-                filter: ['all', ['==', '$type', 'Point']]
-            })
-        })
+              const geojson = {
+                  type: 'FeatureCollection',
+                  features: await fetch(`./${spriteId}.json`)
+                  .then(res => res.json())
+                  .then(sprites => {
+                      const keys = Object.keys(sprites)
+                      keys.sort()
+
+                      return keys.map((key, index) => {
+                          return {
+                              type: 'Feature',
+                              geometry: {
+                                  type: 'Point',
+                                  coordinates: [
+                                    140 + 0.02 * (index % 5),
+                                    35 - 0.005 * (Math.floor(index / 5)),
+                                  ],
+                              },
+                              properties: { key, ...sprites[key] }
+                          }
+                      })
+                  })
+              }
+
+              map.addSource('points', {
+                  type: 'geojson',
+                  data: geojson,
+              })
+              map.addLayer({
+                  id: 'points',
+                  type: 'symbol',
+                  source: 'points',
+                  layout: {
+                      'icon-image': ['get', 'key'],
+                      'icon-size': 1,
+                      'text-font': ['Noto Sans Regular'],
+                      'text-size': 14,
+                      'text-field': '{key}',
+                      'text-offset': [ 0, 1.2 ],
+                  },
+                  paint: {
+                      'text-halo-width': 1.5,
+                      'text-halo-color': 'rgba(255,255,255,0.7)'
+                  },
+                  filter: ['all', ['==', '$type', 'Point']]
+              })
+          })
         }
         main()
 
