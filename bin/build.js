@@ -3,28 +3,20 @@ const fs = require("fs");
 const glob = require("glob");
 const path = require("path");
 
-const allAliases = JSON.parse(
-  fs
-    .readFileSync(path.resolve(__dirname, "..", "src", "config.json"))
-    .toString()
-);
-
-// make aliases with src/config.json
-const alias = (src, data) => {
-  const aliasConfig = allAliases[src] || {};
-  Object.keys(aliasConfig)
-    .filter(
-      (key) => !!aliasConfig[key] && Array.isArray(aliasConfig[key].aliases)
-    )
-    .forEach((key) => {
-      if (!data[key]) {
-        throw new Error(`${key} cannot be found in the layout.`);
-      }
-      const { aliases } = aliasConfig[key];
-      aliases.forEach((aliasKey) => {
+// make aliases with src/${sprite-name}.json
+const alias = (aliasMap, data) => {
+  const keys = Object.keys(aliasMap || {}).filter((key) =>
+    Array.isArray(aliasMap[key])
+  );
+  for (const key of keys) {
+    if (!data[key]) {
+      throw new Error(`${key} cannot be found in the layout.`);
+    } else {
+      aliasMap[key].forEach((aliasKey) => {
         data[aliasKey] = data[key];
       });
-    });
+    }
+  }
 
   return data;
 };
@@ -35,6 +27,15 @@ const alias = (src, data) => {
  * @returns { name: string, data: Buffer }
  */
 const genLayout = (basename, pxRatio) => {
+  let aliasMap = {};
+  try {
+    aliasMap = JSON.parse(
+      fs
+        .readFileSync(path.resolve(__dirname, "..", "src", `${basename}.json`))
+        .toString()
+    ).aliasMap;
+  } catch {}
+
   const imgs = glob
     .sync(path.resolve(__dirname, "..", "src", basename, "*.svg"))
     .map((f) => {
@@ -53,8 +54,11 @@ const genLayout = (basename, pxRatio) => {
         if (error) {
           reject(error);
         } else {
-          const json = JSON.stringify(alias(basename, layout));
-          resolve({ name: `${basename}${postfix}.json`, data: json });
+          const layout = alias(aliasMap, layout);
+          resolve({
+            name: `${basename}${postfix}.json`,
+            data: JSON.stringify(layout),
+          });
         }
       }
     );
