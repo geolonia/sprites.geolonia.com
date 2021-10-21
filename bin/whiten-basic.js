@@ -17,13 +17,16 @@ const parserOptions = {
  * @param {string} styleText
  * @returns mutated style text
  */
-const whitenDefault_x = (styleText) => {
+const whitenDefault_x = (styleText, index) => {
   const styleEntries = styleText
     .split(";")
     .map((kvp) => kvp.split(":").map((value) => value.trim()));
   for (const entry of styleEntries) {
-    if (entry[0] === "fill" || entry[0] === "color") {
-      entry[1] = "#ffffff";
+    if (entry[0] === "fill") {
+      console.log(index);
+      entry[1] = index === 0 ? "#c5c7c9" : "#ffffff"; // #c5c7c9 is the inverse color of #3a3836
+    } else if (entry[0] === "color") {
+      entry[1] = "#c5c7c9";
     }
   }
   return styleEntries.map((entry) => entry.join(":")).join(";");
@@ -47,7 +50,10 @@ const convert = (parent, filename) => {
         child[appendingKey] = "#ffffff";
       } else if (filename.match(/^default_[0-9]/) && key === "rect") {
         const appendingKey = `${parserOptions.attributeNamePrefix}style`;
-        child[appendingKey] = whitenDefault_x(child[appendingKey]);
+        child[appendingKey] = whitenDefault_x(
+          child[appendingKey],
+          children.indexOf(child)
+        );
       } else {
         if (typeof child === "object") {
           convert(child, filename);
