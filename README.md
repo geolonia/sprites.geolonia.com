@@ -36,10 +36,10 @@ https://sprites.geolonia.com/basic-color
 
 ## ビルド
 
-```
+```shell
 $ npm install
-$ npm run build-icon # アイコンをビルド
-$ npm run build-html # HTML ページをビルド
+$ npm run build-icon  # アイコンをビルド。src/basic-white/*.svg は 自動的に生成されます
+$ npm run build-html  # HTML ページをビルド
 ```
 
 プルリクエストや Issue はいつでも歓迎します。
@@ -48,12 +48,12 @@ $ npm run build-html # HTML ページをビルド
 
 ## 免責事項
 
-* 本サーバーは、日本における Mapbox GL JS の開発コミュニティの皆さんのお役に立つために、無償でだれでもご利用可能とさせていただきますが、予告なくサービスを停止させていただくこともございますのであらかじめご了承ください。
+- 本サーバーは、日本における Mapbox GL JS の開発コミュニティの皆さんのお役に立つために、無償でだれでもご利用可能とさせていただきますが、予告なくサービスを停止させていただくこともございますのであらかじめご了承ください。
 
 ## ライセンス
 
 このプロジェクトで同梱している各アイコンのライセンスはそれぞれの配布元で確認してください。
 
-* Maki - [https://github.com/mapbox/maki](https://github.com/mapbox/maki)
+- Maki - [https://github.com/mapbox/maki](https://github.com/mapbox/maki)
 
-それ以外のソースコードはMITライセンスとします。
+それ以外のソースコードは MIT ライセンスとします。
