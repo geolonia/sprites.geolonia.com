@@ -18,7 +18,9 @@ const parserOptions = {
  * @returns mutated style text
  */
 const whitenDefault_x = (styleText) => {
-  const styleEntries = styleText.split(";").map((kvp) => kvp.split(":"));
+  const styleEntries = styleText
+    .split(";")
+    .map((kvp) => kvp.split(":").map((value) => value.trim()));
   for (const entry of styleEntries) {
     if (entry[0] === "fill" || entry[0] === "color") {
       entry[1] = "#ffffff";
