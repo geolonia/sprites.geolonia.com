@@ -13,7 +13,7 @@ const parserOptions = {
 };
 
 /**
- * Special rule be applied for default_x
+ * Special rules which should be applied for default_x
  * @param {string} styleText
  * @returns mutated style text
  */
