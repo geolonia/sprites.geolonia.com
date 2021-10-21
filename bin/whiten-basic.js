@@ -1,4 +1,3 @@
-console.time();
 const fs = require("fs");
 const path = require("path");
 const parser = require("fast-xml-parser");
@@ -21,7 +20,7 @@ const parserOptions = {
 const whitenDefault_x = (styleText) => {
   const styleEntries = styleText.split(";").map((kvp) => kvp.split(":"));
   for (const entry of styleEntries) {
-    if (entry[0] === "fill") {
+    if (entry[0] === "fill" || entry[0] === "color") {
       entry[1] = "#ffffff";
     }
   }
@@ -44,7 +43,7 @@ const convert = (parent, filename) => {
       if (key === "path") {
         const appendingKey = `${parserOptions.attributeNamePrefix}fill`;
         child[appendingKey] = "#ffffff";
-      } else if (filename.match(/$default_[0-9]/) && key === "rect") {
+      } else if (filename.match(/^default_[0-9]/) && key === "rect") {
         const appendingKey = `${parserOptions.attributeNamePrefix}style`;
         child[appendingKey] = whitenDefault_x(child[appendingKey]);
       } else {
@@ -79,4 +78,3 @@ fs.readdirSync(basicDir, {
 
     fs.writeFileSync(dest, whiteXml);
   });
-console.timeEnd();
