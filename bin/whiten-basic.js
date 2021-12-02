@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const parser = require("fast-xml-parser");
 
-const basicDir = path.resolve(__dirname, "..", "src", "basic");
+const basicDir = path.resolve(__dirname, "..", "src", "basic-black");
 const basicWhiteDir = path.resolve(__dirname, "..", "src", "basic-white");
 
 // fast-xml-parser options
