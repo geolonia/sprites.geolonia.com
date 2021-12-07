@@ -23,7 +23,6 @@ const whitenDefault_x = (styleText, index) => {
     .map((kvp) => kvp.split(":").map((value) => value.trim()));
   for (const entry of styleEntries) {
     if (entry[0] === "fill") {
-      console.log(index);
       entry[1] = index === 0 ? "#c5c7c9" : "#ffffff"; // #c5c7c9 is the inverse color of #3a3836
     } else if (entry[0] === "color") {
       entry[1] = "#c5c7c9";
