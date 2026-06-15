@@ -15,9 +15,9 @@
     "@mapbox/maki": "^4.0.0"
   },
   "devDependencies": {
-    "@mapbox/spritezero": "^7.0.1",
+    "@mapbox/spritezero": "^8.0.3",
     "@tilecloud/mdhtml": "^0.2.0",
-    "fast-xml-parser": "^3.20.3",
-    "rimraf": "^3.0.2"
+    "fast-xml-parser": "^5.7.0",
+    "rimraf": "^6.1.3"
   }
 }
